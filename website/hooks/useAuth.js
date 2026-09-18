@@ -2,10 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
+import { authAPI, userAPI } from '@/lib/api';
 
-// Demo-mode auth: works fully offline against localStorage until the
-// backend (see lib/api.js) is connected, at which point swap the bodies
-// below for the commented authAPI calls.
 export function useAuth() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -29,10 +27,8 @@ export function useAuth() {
       setIsLoading(true);
       setError(null);
 
-      // const response = await authAPI.register({ firstName, lastName, email, password });
-      // const { user: userData, token: newToken } = response.data;
-      const userData = { id: crypto.randomUUID(), firstName, lastName, email };
-      const newToken = `demo-${userData.id}`;
+      const response = await authAPI.register({ firstName, lastName, email, password });
+      const { user: userData, token: newToken } = response.data;
 
       localStorage.setItem('token', newToken);
       localStorage.setItem('user', JSON.stringify(userData));
@@ -57,10 +53,8 @@ export function useAuth() {
       setIsLoading(true);
       setError(null);
 
-      // const response = await authAPI.login(email, password);
-      // const { user: userData, token: newToken } = response.data;
-      const userData = { id: crypto.randomUUID(), firstName: email.split('@')[0], lastName: '', email };
-      const newToken = `demo-${userData.id}`;
+      const response = await authAPI.login(email, password);
+      const { user: userData, token: newToken } = response.data;
 
       localStorage.setItem('token', newToken);
       localStorage.setItem('user', JSON.stringify(userData));
@@ -81,17 +75,25 @@ export function useAuth() {
   }, []);
 
   const logout = useCallback(async () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-    setToken(null);
-    toast.success('Logged out successfully');
+    try {
+      await authAPI.logout();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+      setToken(null);
+      toast.success('Logged out successfully');
+    }
   }, []);
 
   const updateProfile = useCallback(async (profileData) => {
     try {
       setIsLoading(true);
-      const updatedUser = { ...user, ...profileData };
+      const response = await userAPI.updateProfile(profileData);
+
+      const updatedUser = { ...user, ...response.data };
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setUser(updatedUser);
 

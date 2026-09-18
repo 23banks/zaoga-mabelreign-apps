@@ -10,13 +10,13 @@ const validate = (schema) => (req, res, next) => {
 
 const schemas = {
   userRegister: Joi.object({
-    email: Joi.string().email().required(),
+    email: Joi.string().email({ tlds: { allow: false } }).required(),
     password: Joi.string().min(8).required(),
     firstName: Joi.string().min(1).max(100).required(),
     lastName: Joi.string().min(1).max(100).required(),
   }),
   userLogin: Joi.object({
-    email: Joi.string().email().required(),
+    email: Joi.string().email({ tlds: { allow: false } }).required(),
     password: Joi.string().required(),
   }),
   prayerRequest: Joi.object({

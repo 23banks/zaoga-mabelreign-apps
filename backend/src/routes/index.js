@@ -1,5 +1,6 @@
 const express = require('express');
 const authRoutes = require('./auth');
+const userRoutes = require('./users');
 const sermonRoutes = require('./sermons');
 const eventRoutes = require('./events');
 const prayerRoutes = require('./prayers');
@@ -11,6 +12,7 @@ const announcementRoutes = require('./announcements');
 const router = express.Router();
 
 router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
 router.use('/sermons', sermonRoutes);
 router.use('/events', eventRoutes);
 router.use('/prayer-requests', prayerRoutes);

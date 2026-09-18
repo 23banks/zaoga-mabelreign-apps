@@ -23,17 +23,21 @@ const config = {
 let pool = null;
 
 async function getPool() {
-  try {
-    if (!pool) {
-      pool = new sql.ConnectionPool(config);
-      await pool.connect();
-      console.log('Connected to MS SQL Server');
+  if (pool) {
+    return pool;
+  }
 
-      const result = await pool.request().query('SELECT 1 as connected');
-      if (result.recordset[0].connected === 1) {
-        console.log('Database connection verified');
-      }
+  try {
+    const newPool = new sql.ConnectionPool(config);
+    await newPool.connect();
+    console.log('Connected to MS SQL Server');
+
+    const result = await newPool.request().query('SELECT 1 as connected');
+    if (result.recordset[0].connected === 1) {
+      console.log('Database connection verified');
     }
+
+    pool = newPool;
     return pool;
   } catch (error) {
     console.error('Database connection failed:', error.message);
