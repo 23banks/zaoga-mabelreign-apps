@@ -53,8 +53,17 @@ export default function GalleryPage() {
         <>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((m) => (
-              <div key={m.id} className="card text-center">
-                <div className="text-6xl mb-4">{mediaEmoji(m.type)}</div>
+              <div key={m.id} className="card text-center overflow-hidden">
+                {m.url ? (
+                  m.type === 'video' ? (
+                    <video src={m.url} controls className="w-full h-48 object-cover rounded-lg mb-4 bg-black" />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={m.url} alt={m.title} className="w-full h-48 object-cover rounded-lg mb-4" />
+                  )
+                ) : (
+                  <div className="text-6xl mb-4">{mediaEmoji(m.type)}</div>
+                )}
                 <h3 className="font-semibold text-gray-900">{m.title}</h3>
                 <p className="text-sm text-gray-500 mt-1">{m.event}</p>
                 <span className="badge bg-primary/10 text-primary mt-3 capitalize">{m.type}</span>

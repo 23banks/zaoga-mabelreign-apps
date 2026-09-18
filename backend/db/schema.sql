@@ -73,6 +73,16 @@ CREATE TABLE dbo.events (
 );
 GO
 
+IF OBJECT_ID('dbo.event_registrations', 'U') IS NULL
+CREATE TABLE dbo.event_registrations (
+    id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    event_id UNIQUEIDENTIFIER NOT NULL REFERENCES dbo.events(id) ON DELETE CASCADE,
+    user_id UNIQUEIDENTIFIER NOT NULL REFERENCES dbo.users(id) ON DELETE CASCADE,
+    created_at DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    CONSTRAINT UQ_event_user UNIQUE (event_id, user_id)
+);
+GO
+
 IF OBJECT_ID('dbo.prayer_requests', 'U') IS NULL
 CREATE TABLE dbo.prayer_requests (
     id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
@@ -114,6 +124,11 @@ CREATE TABLE dbo.media (
     title NVARCHAR(255) NOT NULL,
     type NVARCHAR(10) NOT NULL, -- photo | video
     event_name NVARCHAR(255) NOT NULL,
+    file_url NVARCHAR(500) NULL,
     created_at DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
 );
+GO
+
+IF COL_LENGTH('dbo.media', 'file_url') IS NULL
+    ALTER TABLE dbo.media ADD file_url NVARCHAR(500) NULL;
 GO

@@ -50,69 +50,67 @@ export const authAPI = {
 export const userAPI = {
   getProfile: async () => apiClient.get('/users/me'),
   updateProfile: async (data) => apiClient.put('/users/me', data),
-  uploadAvatar: async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    return apiClient.post('/users/me/avatar', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-  },
-  getUser: async (id) => apiClient.get(`/users/${id}`),
+  getAll: async () => apiClient.get('/users'),
+  updateRole: async (id, role) => apiClient.put(`/users/${id}/role`, { role }),
 };
 
 export const sermonAPI = {
-  getAll: async (page = 1, limit = 10, category = null) => {
-    const params = { page, limit };
-    if (category) params.category = category;
-    return apiClient.get('/sermons', { params });
-  },
+  getAll: async () => apiClient.get('/sermons'),
   getById: async (id) => apiClient.get(`/sermons/${id}`),
-  recordView: async (id) => apiClient.post(`/sermons/${id}/view`),
+  create: async (data) => apiClient.post('/sermons', data),
+  update: async (id, data) => apiClient.put(`/sermons/${id}`, data),
+  delete: async (id) => apiClient.delete(`/sermons/${id}`),
 };
 
 export const eventAPI = {
-  getAll: async (page = 1, limit = 10, type = null) => {
-    const params = { page, limit };
-    if (type) params.type = type;
-    return apiClient.get('/events', { params });
-  },
+  getAll: async () => apiClient.get('/events'),
   getById: async (id) => apiClient.get(`/events/${id}`),
+  create: async (data) => apiClient.post('/events', data),
+  update: async (id, data) => apiClient.put(`/events/${id}`, data),
+  delete: async (id) => apiClient.delete(`/events/${id}`),
   register: async (id) => apiClient.post(`/events/${id}/register`),
   unregister: async (id) => apiClient.post(`/events/${id}/unregister`),
 };
 
 export const prayerAPI = {
-  getAll: async (page = 1, limit = 10, status = null) => {
-    const params = { page, limit };
-    if (status) params.status = status;
-    return apiClient.get('/prayer-requests', { params });
-  },
+  getAll: async () => apiClient.get('/prayer-requests'),
   create: async (data) => apiClient.post('/prayer-requests', data),
   pray: async (id) => apiClient.post(`/prayer-requests/${id}/pray`),
+  delete: async (id) => apiClient.delete(`/prayer-requests/${id}`),
 };
 
 export const testimonyAPI = {
-  getAll: async (page = 1, limit = 10) => apiClient.get('/testimonies', { params: { page, limit } }),
+  getAll: async () => apiClient.get('/testimonies'),
   create: async (data) => apiClient.post('/testimonies', data),
   like: async (id) => apiClient.post(`/testimonies/${id}/like`),
+  delete: async (id) => apiClient.delete(`/testimonies/${id}`),
 };
 
 export const devotionAPI = {
-  getAll: async (page = 1, limit = 10) => apiClient.get('/devotions', { params: { page, limit } }),
+  getAll: async () => apiClient.get('/devotions'),
   getToday: async () => apiClient.get('/devotions/today'),
+  create: async (data) => apiClient.post('/devotions', data),
+  delete: async (id) => apiClient.delete(`/devotions/${id}`),
 };
 
 export const mediaAPI = {
-  getAll: async (page = 1, limit = 12, type = null) => {
-    const params = { page, limit };
-    if (type) params.type = type;
-    return apiClient.get('/media', { params });
+  getAll: async () => apiClient.get('/media'),
+  upload: async ({ file, title, event }) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (title) formData.append('title', title);
+    if (event) formData.append('event', event);
+    return apiClient.post('/media', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   },
-  like: async (id) => apiClient.post(`/media/${id}/like`),
+  delete: async (id) => apiClient.delete(`/media/${id}`),
 };
 
 export const announcementAPI = {
-  getAll: async (page = 1, limit = 10) => apiClient.get('/announcements', { params: { page, limit } }),
+  getAll: async () => apiClient.get('/announcements'),
+  create: async (data) => apiClient.post('/announcements', data),
+  delete: async (id) => apiClient.delete(`/announcements/${id}`),
 };
 
 export default apiClient;

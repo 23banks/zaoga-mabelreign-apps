@@ -38,7 +38,11 @@ export default async function EventDetailPage({ params }) {
 
         <p className="text-gray-700 leading-relaxed mb-6">{event.description}</p>
 
-        <EventRegisterButton eventTitle={event.title} />
+        <EventRegisterButton
+          eventId={event.id}
+          eventTitle={event.title}
+          initialAttendeeCount={event.attendeeCount}
+        />
       </div>
     </div>
   );

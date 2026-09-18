@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const routes = require('./routes');
 const errorHandler = require('./middleware/errorHandler');
@@ -21,6 +22,8 @@ app.use((req, res, next) => {
   console.log(`[${timestamp}] ${req.method} ${req.path}`);
   next();
 });
+
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 app.use('/api/v1', routes);
 

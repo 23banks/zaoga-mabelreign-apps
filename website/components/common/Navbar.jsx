@@ -18,7 +18,8 @@ const navLinks = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuthContext();
+  const { user, isAuthenticated, logout } = useAuthContext();
+  const isAdmin = user?.role === 'admin';
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
@@ -57,6 +58,11 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                {isAdmin && (
+                  <Link href="/admin" className="text-gray-600 hover:text-primary text-sm font-medium">
+                    Admin
+                  </Link>
+                )}
                 <Link href="/dashboard" className="text-gray-600 hover:text-primary text-sm font-medium">
                   Dashboard
                 </Link>
@@ -95,6 +101,15 @@ export default function Navbar() {
               </div>
             ) : (
               <>
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="block text-gray-600 hover:text-primary"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Admin
+                  </Link>
+                )}
                 <Link
                   href="/dashboard"
                   className="block text-gray-600 hover:text-primary"

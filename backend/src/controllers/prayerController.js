@@ -37,3 +37,8 @@ exports.pray = async (req, res) => {
   if (rows.length === 0) return res.status(404).json({ message: 'Prayer request not found' });
   res.json(map(rows[0]));
 };
+
+exports.remove = async (req, res) => {
+  await query('DELETE FROM prayer_requests WHERE id = @id', { id: req.params.id });
+  res.status(204).end();
+};
