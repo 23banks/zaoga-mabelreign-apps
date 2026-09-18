@@ -1,12 +1,22 @@
 'use client';
 
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import Button from '@/components/common/Button';
 import { useAuthContext } from '@/hooks/AuthContext';
-import { announcements } from '@/lib/mockData';
+import { announcementAPI } from '@/lib/api';
+import { formatDate } from '@/lib/format';
 
 export default function DashboardPage() {
   const { user } = useAuthContext();
+  const [announcements, setAnnouncements] = useState([]);
+
+  useEffect(() => {
+    announcementAPI
+      .getAll()
+      .then((res) => setAnnouncements(res.data))
+      .catch(() => setAnnouncements([]));
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -59,7 +69,7 @@ export default function DashboardPage() {
                 {a.urgent && <span className="badge bg-red-100 text-red-700 shrink-0">Urgent</span>}
               </div>
               <p className="text-gray-600 text-sm mt-2">{a.body}</p>
-              <p className="text-gray-400 text-xs mt-3">{a.date}</p>
+              <p className="text-gray-400 text-xs mt-3">{formatDate(a.date)}</p>
             </div>
           ))}
         </div>

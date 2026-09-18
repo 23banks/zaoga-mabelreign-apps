@@ -1,21 +1,19 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Play, Headphones } from 'lucide-react';
-import { sermons } from '@/lib/mockData';
-
-export function generateStaticParams() {
-  return sermons.map((s) => ({ id: String(s.id) }));
-}
+import { getJSON } from '@/lib/serverApi';
+import { sermonEmoji, formatDate } from '@/lib/format';
 
 export default async function SermonDetailPage({ params }) {
   const { id } = await params;
-  const sermon = sermons.find((s) => String(s.id) === id);
+  const sermon = await getJSON(`/sermons/${id}`);
 
   if (!sermon) {
     notFound();
   }
 
-  const related = sermons.filter((s) => s.id !== sermon.id && s.category === sermon.category).slice(0, 2);
+  const allSermons = (await getJSON('/sermons')) || [];
+  const related = allSermons.filter((s) => s.id !== sermon.id && s.category === sermon.category).slice(0, 2);
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-3xl">
@@ -26,7 +24,7 @@ export default async function SermonDetailPage({ params }) {
 
       <div className="card">
         <div className="flex items-center justify-center bg-gray-100 rounded-lg h-56 text-7xl mb-6">
-          {sermon.thumbnail}
+          {sermonEmoji(sermon.type)}
         </div>
         <span className="badge bg-primary/10 text-primary flex items-center gap-1 w-fit mb-3">
           {sermon.type === 'video' ? <Play size={12} /> : <Headphones size={12} />}
@@ -34,7 +32,7 @@ export default async function SermonDetailPage({ params }) {
         </span>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{sermon.title}</h1>
         <p className="text-gray-500 mb-6">
-          {sermon.speaker} &middot; {sermon.date} &middot; {sermon.category}
+          {sermon.speaker} &middot; {formatDate(sermon.date)} &middot; {sermon.category}
         </p>
         <p className="text-gray-700 leading-relaxed">{sermon.description}</p>
       </div>

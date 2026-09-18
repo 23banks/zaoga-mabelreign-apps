@@ -1,19 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { HeartHandshake } from 'lucide-react';
 import SectionHeading from '@/components/common/SectionHeading';
 import Textarea from '@/components/common/Textarea';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
-import { prayerRequests as initialRequests } from '@/lib/mockData';
+import { prayerAPI } from '@/lib/api';
+import { formatDate } from '@/lib/format';
 
 export default function PrayersPage() {
-  const [requests, setRequests] = useState(initialRequests);
+  const [requests, setRequests] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [form, setForm] = useState({ name: '', request: '', isAnonymous: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [prayedIds, setPrayedIds] = useState([]);
+
+  useEffect(() => {
+    prayerAPI
+      .getAll()
+      .then((res) => setRequests(res.data))
+      .catch(() => toast.error('Failed to load prayer requests'))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -28,31 +38,28 @@ export default function PrayersPage() {
     }
 
     setIsSubmitting(true);
-    // TODO: replace with prayerAPI.create(form) once the backend is connected
-    await new Promise((r) => setTimeout(r, 400));
-
-    setRequests((prev) => [
-      {
-        id: Date.now(),
-        name: form.isAnonymous || !form.name ? 'Anonymous Member' : form.name,
-        request: form.request,
-        date: new Date().toISOString().slice(0, 10),
-        prayedFor: 0,
-        status: 'open',
-      },
-      ...prev,
-    ]);
-    setForm({ name: '', request: '', isAnonymous: false });
-    setIsSubmitting(false);
-    toast.success('Your prayer request has been submitted');
+    try {
+      const name = form.isAnonymous || !form.name ? '' : form.name;
+      const res = await prayerAPI.create({ name, request: form.request });
+      setRequests((prev) => [res.data, ...prev]);
+      setForm({ name: '', request: '', isAnonymous: false });
+      toast.success('Your prayer request has been submitted');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to submit prayer request');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handlePray = (id) => {
+  const handlePray = async (id) => {
     if (prayedIds.includes(id)) return;
     setPrayedIds((prev) => [...prev, id]);
-    setRequests((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, prayedFor: r.prayedFor + 1 } : r))
-    );
+    try {
+      const res = await prayerAPI.pray(id);
+      setRequests((prev) => prev.map((r) => (r.id === id ? res.data : r)));
+    } catch {
+      setPrayedIds((prev) => prev.filter((i) => i !== id));
+    }
   };
 
   return (
@@ -94,26 +101,31 @@ export default function PrayersPage() {
         </div>
 
         <div className="lg:col-span-2 space-y-4">
-          {requests.map((r) => (
-            <div key={r.id} className="card">
-              <div className="flex items-center justify-between mb-2">
-                <p className="font-semibold text-gray-900">{r.name}</p>
-                <p className="text-xs text-gray-400">{r.date}</p>
+          {isLoading && <p className="text-gray-500">Loading prayer requests...</p>}
+          {!isLoading &&
+            requests.map((r) => (
+              <div key={r.id} className="card">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-semibold text-gray-900">{r.name}</p>
+                  <p className="text-xs text-gray-400">{formatDate(r.date)}</p>
+                </div>
+                <p className="text-gray-700 mb-4">{r.request}</p>
+                <button
+                  onClick={() => handlePray(r.id)}
+                  disabled={prayedIds.includes(r.id)}
+                  className={`inline-flex items-center gap-2 text-sm font-medium ${
+                    prayedIds.includes(r.id) ? 'text-primary' : 'text-gray-500 hover:text-primary'
+                  }`}
+                >
+                  <HeartHandshake size={16} />
+                  {prayedIds.includes(r.id) ? "You're praying for this" : "I'm praying for this"}
+                  <span className="text-gray-400">&middot; {r.prayedFor}</span>
+                </button>
               </div>
-              <p className="text-gray-700 mb-4">{r.request}</p>
-              <button
-                onClick={() => handlePray(r.id)}
-                disabled={prayedIds.includes(r.id)}
-                className={`inline-flex items-center gap-2 text-sm font-medium ${
-                  prayedIds.includes(r.id) ? 'text-primary' : 'text-gray-500 hover:text-primary'
-                }`}
-              >
-                <HeartHandshake size={16} />
-                {prayedIds.includes(r.id) ? "You're praying for this" : "I'm praying for this"}
-                <span className="text-gray-400">&middot; {r.prayedFor}</span>
-              </button>
-            </div>
-          ))}
+            ))}
+          {!isLoading && requests.length === 0 && (
+            <p className="text-gray-500">No prayer requests yet. Be the first to share one.</p>
+          )}
         </div>
       </div>
     </div>

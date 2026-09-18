@@ -1,17 +1,28 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import SectionHeading from '@/components/common/SectionHeading';
-import { mediaGallery } from '@/lib/mockData';
+import { mediaAPI } from '@/lib/api';
+import { mediaEmoji } from '@/lib/format';
 
 const types = ['All', 'photo', 'video'];
 
 export default function GalleryPage() {
+  const [media, setMedia] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [type, setType] = useState('All');
 
+  useEffect(() => {
+    mediaAPI
+      .getAll()
+      .then((res) => setMedia(res.data))
+      .catch(() => setMedia([]))
+      .finally(() => setIsLoading(false));
+  }, []);
+
   const filtered = useMemo(
-    () => (type === 'All' ? mediaGallery : mediaGallery.filter((m) => m.type === type)),
-    [type]
+    () => (type === 'All' ? media : media.filter((m) => m.type === type)),
+    [media, type]
   );
 
   return (
@@ -36,16 +47,25 @@ export default function GalleryPage() {
         ))}
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map((m) => (
-          <div key={m.id} className="card text-center">
-            <div className="text-6xl mb-4">{m.emoji}</div>
-            <h3 className="font-semibold text-gray-900">{m.title}</h3>
-            <p className="text-sm text-gray-500 mt-1">{m.event}</p>
-            <span className="badge bg-primary/10 text-primary mt-3 capitalize">{m.type}</span>
+      {isLoading ? (
+        <p className="text-center text-gray-500">Loading gallery...</p>
+      ) : (
+        <>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((m) => (
+              <div key={m.id} className="card text-center">
+                <div className="text-6xl mb-4">{mediaEmoji(m.type)}</div>
+                <h3 className="font-semibold text-gray-900">{m.title}</h3>
+                <p className="text-sm text-gray-500 mt-1">{m.event}</p>
+                <span className="badge bg-primary/10 text-primary mt-3 capitalize">{m.type}</span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+          {filtered.length === 0 && (
+            <p className="text-center text-gray-500 mt-12">No media in this category yet.</p>
+          )}
+        </>
+      )}
     </div>
   );
 }

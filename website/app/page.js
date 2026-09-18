@@ -2,12 +2,19 @@ import Link from 'next/link';
 import { ArrowRight, BookOpen, Calendar, HeartHandshake, Bell } from 'lucide-react';
 import Button from '@/components/common/Button';
 import SectionHeading from '@/components/common/SectionHeading';
-import { announcements, sermons, events } from '@/lib/mockData';
+import { getJSON } from '@/lib/serverApi';
+import { formatDate, sermonEmoji } from '@/lib/format';
 
-export default function Home() {
-  const latestAnnouncements = announcements.slice(0, 2);
-  const featuredSermons = sermons.slice(0, 3);
-  const upcomingEvents = events.slice(0, 3);
+export default async function Home() {
+  const [announcements, sermons, events] = await Promise.all([
+    getJSON('/announcements'),
+    getJSON('/sermons'),
+    getJSON('/events'),
+  ]);
+
+  const latestAnnouncements = (announcements || []).slice(0, 2);
+  const featuredSermons = (sermons || []).slice(0, 3);
+  const upcomingEvents = (events || []).slice(0, 3);
 
   return (
     <div>
@@ -50,7 +57,7 @@ export default function Home() {
                     {a.urgent && <span className="badge bg-red-100 text-red-700 shrink-0">Urgent</span>}
                   </div>
                   <p className="text-gray-600 text-sm mt-2">{a.body}</p>
-                  <p className="text-gray-400 text-xs mt-3">{a.date}</p>
+                  <p className="text-gray-400 text-xs mt-3">{formatDate(a.date)}</p>
                 </div>
               ))}
             </div>
@@ -108,13 +115,16 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-6">
             {featuredSermons.map((s) => (
               <Link key={s.id} href={`/sermons/${s.id}`} className="card block">
-                <div className="text-4xl mb-3">{s.thumbnail}</div>
+                <div className="text-4xl mb-3">{sermonEmoji(s.type)}</div>
                 <h3 className="font-bold text-lg text-gray-900 mb-1">{s.title}</h3>
                 <p className="text-sm text-gray-500 mb-2">{s.speaker} &middot; {s.duration}</p>
                 <p className="text-gray-600 text-sm">{s.description}</p>
               </Link>
             ))}
           </div>
+          {featuredSermons.length === 0 && (
+            <p className="text-center text-gray-500">No sermons published yet.</p>
+          )}
         </div>
       </section>
 
@@ -131,11 +141,14 @@ export default function Home() {
               <Link key={e.id} href={`/events/${e.id}`} className="card block">
                 <span className="badge bg-primary/10 text-primary mb-3">{e.category}</span>
                 <h3 className="font-bold text-lg text-gray-900 mb-1">{e.title}</h3>
-                <p className="text-sm text-gray-500 mb-2">{e.date} at {e.time}</p>
+                <p className="text-sm text-gray-500 mb-2">{formatDate(e.date)} at {e.time}</p>
                 <p className="text-gray-600 text-sm">{e.location}</p>
               </Link>
             ))}
           </div>
+          {upcomingEvents.length === 0 && (
+            <p className="text-center text-gray-500">No upcoming events yet.</p>
+          )}
         </div>
       </section>
 

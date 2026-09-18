@@ -1,16 +1,13 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, CalendarDays, MapPin, Clock } from 'lucide-react';
-import { events } from '@/lib/mockData';
+import { getJSON } from '@/lib/serverApi';
+import { formatDate } from '@/lib/format';
 import EventRegisterButton from '@/components/events/EventRegisterButton';
-
-export function generateStaticParams() {
-  return events.map((e) => ({ id: String(e.id) }));
-}
 
 export default async function EventDetailPage({ params }) {
   const { id } = await params;
-  const event = events.find((e) => String(e.id) === id);
+  const event = await getJSON(`/events/${id}`);
 
   if (!event) {
     notFound();
@@ -29,7 +26,7 @@ export default async function EventDetailPage({ params }) {
 
         <div className="space-y-2 text-gray-600 mb-6">
           <p className="flex items-center gap-2">
-            <CalendarDays size={18} className="text-primary" /> {event.date}
+            <CalendarDays size={18} className="text-primary" /> {formatDate(event.date)}
           </p>
           <p className="flex items-center gap-2">
             <Clock size={18} className="text-primary" /> {event.time}

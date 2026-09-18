@@ -1,19 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Heart } from 'lucide-react';
 import SectionHeading from '@/components/common/SectionHeading';
 import Input from '@/components/common/Input';
 import Textarea from '@/components/common/Textarea';
 import Button from '@/components/common/Button';
-import { testimonies as initialTestimonies } from '@/lib/mockData';
+import { testimonyAPI } from '@/lib/api';
+import { formatDate } from '@/lib/format';
 
 export default function TestimoniesPage() {
-  const [testimonies, setTestimonies] = useState(initialTestimonies);
+  const [testimonies, setTestimonies] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [likedIds, setLikedIds] = useState([]);
   const [form, setForm] = useState({ name: '', title: '', story: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    testimonyAPI
+      .getAll()
+      .then((res) => setTestimonies(res.data))
+      .catch(() => toast.error('Failed to load testimonies'))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,29 +38,27 @@ export default function TestimoniesPage() {
     }
 
     setIsSubmitting(true);
-    // TODO: replace with testimonyAPI.create(form) once the backend is connected
-    await new Promise((r) => setTimeout(r, 400));
-
-    setTestimonies((prev) => [
-      {
-        id: Date.now(),
-        name: form.name || 'Anonymous Member',
-        title: form.title,
-        story: form.story,
-        date: new Date().toISOString().slice(0, 10),
-        likes: 0,
-      },
-      ...prev,
-    ]);
-    setForm({ name: '', title: '', story: '' });
-    setIsSubmitting(false);
-    toast.success('Thank you for sharing your testimony!');
+    try {
+      const res = await testimonyAPI.create(form);
+      setTestimonies((prev) => [res.data, ...prev]);
+      setForm({ name: '', title: '', story: '' });
+      toast.success("Thank you for sharing your testimony!");
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to share testimony');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleLike = (id) => {
+  const handleLike = async (id) => {
     if (likedIds.includes(id)) return;
     setLikedIds((prev) => [...prev, id]);
-    setTestimonies((prev) => prev.map((t) => (t.id === id ? { ...t, likes: t.likes + 1 } : t)));
+    try {
+      const res = await testimonyAPI.like(id);
+      setTestimonies((prev) => prev.map((t) => (t.id === id ? res.data : t)));
+    } catch {
+      setLikedIds((prev) => prev.filter((i) => i !== id));
+    }
   };
 
   return (
@@ -95,28 +103,33 @@ export default function TestimoniesPage() {
         </div>
 
         <div className="lg:col-span-2 space-y-4">
-          {testimonies.map((t) => (
-            <div key={t.id} className="card">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-gray-900">{t.title}</h3>
-                <p className="text-xs text-gray-400">{t.date}</p>
+          {isLoading && <p className="text-gray-500">Loading testimonies...</p>}
+          {!isLoading &&
+            testimonies.map((t) => (
+              <div key={t.id} className="card">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-bold text-gray-900">{t.title}</h3>
+                  <p className="text-xs text-gray-400">{formatDate(t.date)}</p>
+                </div>
+                <p className="text-gray-700 mb-4">{t.story}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-500">— {t.name}</p>
+                  <button
+                    onClick={() => handleLike(t.id)}
+                    disabled={likedIds.includes(t.id)}
+                    className={`inline-flex items-center gap-1 text-sm font-medium ${
+                      likedIds.includes(t.id) ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
+                    }`}
+                  >
+                    <Heart size={16} fill={likedIds.includes(t.id) ? 'currentColor' : 'none'} />
+                    {t.likes}
+                  </button>
+                </div>
               </div>
-              <p className="text-gray-700 mb-4">{t.story}</p>
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-500">— {t.name}</p>
-                <button
-                  onClick={() => handleLike(t.id)}
-                  disabled={likedIds.includes(t.id)}
-                  className={`inline-flex items-center gap-1 text-sm font-medium ${
-                    likedIds.includes(t.id) ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
-                  }`}
-                >
-                  <Heart size={16} fill={likedIds.includes(t.id) ? 'currentColor' : 'none'} />
-                  {t.likes}
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
+          {!isLoading && testimonies.length === 0 && (
+            <p className="text-gray-500">No testimonies yet. Be the first to share one.</p>
+          )}
         </div>
       </div>
     </div>

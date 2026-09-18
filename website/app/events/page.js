@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { CalendarDays, MapPin } from 'lucide-react';
 import SectionHeading from '@/components/common/SectionHeading';
-import { events } from '@/lib/mockData';
+import { getJSON } from '@/lib/serverApi';
+import { formatDate } from '@/lib/format';
 
-export default function EventsPage() {
+export default async function EventsPage() {
+  const events = (await getJSON('/events')) || [];
   const sorted = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
@@ -30,7 +32,7 @@ export default function EventsPage() {
               </div>
               <p className="text-gray-600 text-sm mb-2">{e.description}</p>
               <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span>{e.date} at {e.time}</span>
+                <span>{formatDate(e.date)} at {e.time}</span>
                 <span className="flex items-center gap-1">
                   <MapPin size={14} /> {e.location}
                 </span>
@@ -39,6 +41,10 @@ export default function EventsPage() {
           </Link>
         ))}
       </div>
+
+      {sorted.length === 0 && (
+        <p className="text-center text-gray-500 mt-12">No events scheduled yet.</p>
+      )}
     </div>
   );
 }

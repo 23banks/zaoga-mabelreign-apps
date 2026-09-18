@@ -1,3 +1,6 @@
+-- Run with `sqlcmd -f 65001 -i seed.sql ...` (UTF-8 input codepage) —
+-- without it, sqlcmd misreads the non-ASCII em dashes below and corrupts
+-- them on insert.
 USE zaoga_db;
 GO
 
