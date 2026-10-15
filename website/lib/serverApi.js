@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.INTERNAL_API_URL || 'http://localhost:5400/api/v1';
 
 export async function getJSON(path) {
   try {

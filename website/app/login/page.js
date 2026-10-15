@@ -93,7 +93,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-6 text-center text-sm text-gray-500">
-          <p>This is a demo login — any email and password will work.</p>
+          <p>For support, email: support@zaogafifmabelreign.org</p>
         </div>
       </div>
     </div>

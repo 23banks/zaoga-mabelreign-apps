@@ -27,4 +27,4 @@ npm install
 npm run dev
 ```
 
-Then visit http://localhost:3000 (API at http://localhost:5000).
+Then visit http://localhost:3400 (API at http://localhost:5400).

@@ -3,7 +3,6 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { query } = require('../config/database');
 
-const API_URL = process.env.API_URL || 'http://localhost:5000';
 const UPLOAD_DIR = path.join(__dirname, '..', '..', 'uploads');
 
 const map = (r) => ({
@@ -11,7 +10,7 @@ const map = (r) => ({
   title: r.title,
   type: r.type,
   event: r.event_name,
-  url: r.file_url ? `${API_URL}${r.file_url}` : null,
+  url: r.file_url || null,
 });
 
 exports.getAll = async (req, res) => {
