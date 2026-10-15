@@ -1,3 +1,8 @@
 .DS_Store
 Thumbs.db
 *.log
+
+# Local tooling and screenshots, not part of the app
+.tools/
+screenshots/
+screenshots.zip

@@ -1,27 +1,32 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f9fafb;
-  --foreground: #1f2937;
-  --color-primary: #6366f1;
-  --color-secondary: #8b5cf6;
+@theme {
+  --color-primary: #1f2a6b;
+  --color-secondary: #3a4fc4;
+  --color-accent: #c9972b;
+  --color-accent-light: #f6ecd2;
+  --color-ink: #0f1540;
   --color-success: #10b981;
   --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-dark: #1f2937;
+  --color-danger: #dc2626;
+  --color-dark: #1a1916;
+
+  /* warm neutrals replace the default cool grays site-wide */
+  --color-gray-50: #faf8f4;
+  --color-gray-100: #f3f0e9;
+  --color-gray-200: #e7e2d8;
+  --color-gray-300: #d3ccbf;
+  --color-gray-400: #a8a193;
+  --color-gray-500: #736d60;
+  --color-gray-600: #5c574c;
+  --color-gray-700: #433f37;
+  --color-gray-800: #2b2924;
+  --color-gray-900: #1a1916;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--color-primary);
-  --color-secondary: var(--color-secondary);
-  --color-success: var(--color-success);
-  --color-warning: var(--color-warning);
-  --color-danger: var(--color-danger);
-  --color-dark: var(--color-dark);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: var(--font-playfair), Georgia, "Times New Roman", serif;
 }
 
 * {
@@ -33,45 +38,83 @@ html {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--color-gray-50);
+  color: var(--color-gray-900);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.container {
-  @apply mx-auto px-4 sm:px-6 lg:px-8;
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
 }
 
+::selection {
+  background: var(--color-accent-light);
+  color: var(--color-ink);
+}
+
+.container {
+  @apply mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl;
+}
+
+/* ---------- buttons ---------- */
 .btn-primary {
-  @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center px-5 py-2 rounded-full font-semibold text-white bg-primary hover:bg-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed;
 }
 
 .btn-secondary {
-  @apply inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center px-5 py-2 rounded-full font-semibold text-primary bg-white border border-gray-300 hover:border-primary hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed;
 }
 
-.btn-danger {
-  @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg font-medium text-white bg-danger hover:bg-danger/90 focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed;
-}
-
-.btn-ghost {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-primary hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary transition-colors;
-}
-
+/* ---------- surfaces ---------- */
 .card {
-  @apply bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6;
+  @apply bg-white rounded-2xl border border-gray-200/70 shadow-sm p-6 transition duration-200;
 }
 
+a.card:hover,
+button.card:hover {
+  @apply shadow-xl shadow-primary/10 -translate-y-1 border-accent/40;
+}
+
+/* ---------- forms ---------- */
 .form-input {
-  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0 transition-all;
+  @apply w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition;
 }
 
 .form-label {
-  @apply block text-sm font-medium text-gray-700 mb-2;
+  @apply block text-sm font-semibold text-gray-700 mb-1.5;
 }
 
 .badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+}
+
+/* ---------- motion ---------- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up {
+    animation: none;
+  }
+  a.card:hover,
+  button.card:hover {
+    transform: none;
+  }
 }

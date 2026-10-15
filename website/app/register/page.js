@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
+import AuthShell from '@/components/auth/AuthShell';
 import { useAuthContext } from '@/hooks/AuthContext';
 
 export default function RegisterPage() {
@@ -48,103 +48,90 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[80vh] bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center text-primary hover:text-primary/80 mb-6">
-            <ArrowLeft size={20} className="mr-2" />
-            Back to Home
-          </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Join ZAOGA FIF</h1>
-          <p className="text-gray-600">Create your account to get started</p>
+    <AuthShell title="Join ZAOGA FIF" subtitle="Create your account to get started">
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm">{error}</div>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="First Name"
+            type="text"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            placeholder="John"
+            required
+          />
+          <Input
+            label="Last Name"
+            type="text"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            placeholder="Doe"
+            required
+          />
         </div>
 
-        <div className="card">
-          {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">{error}</div>
-          )}
+        <Input
+          label="Email Address"
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="your@email.com"
+          required
+        />
 
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="First Name"
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                placeholder="John"
-                required
-              />
-              <Input
-                label="Last Name"
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                placeholder="Doe"
-                required
-              />
-            </div>
+        <Input
+          label="Password"
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          placeholder="At least 8 characters"
+          required
+        />
 
-            <Input
-              label="Email Address"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="your@email.com"
-              required
-            />
+        <Input
+          label="Confirm Password"
+          type="password"
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          placeholder="••••••••"
+          required
+        />
 
-            <Input
-              label="Password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="At least 8 characters"
-              required
-            />
-
-            <Input
-              label="Confirm Password"
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="••••••••"
-              required
-            />
-
-            <div className="mb-6">
-              <label className="flex items-start">
-                <input type="checkbox" className="mt-1 mr-3 rounded" required />
-                <span className="text-sm text-gray-600">
-                  I agree to the{' '}
-                  <a href="#" className="text-primary hover:text-primary/80">
-                    Terms of Service
-                  </a>{' '}
-                  and{' '}
-                  <a href="#" className="text-primary hover:text-primary/80">
-                    Privacy Policy
-                  </a>
-                </span>
-              </label>
-            </div>
-
-            <Button type="submit" variant="primary" size="lg" isLoading={isLoading} className="w-full">
-              Create Account
-            </Button>
-          </form>
-
-          <p className="text-center text-gray-600 mt-6">
-            Already have an account?{' '}
-            <Link href="/login" className="text-primary hover:text-primary/80 font-semibold">
-              Sign in here
-            </Link>
-          </p>
+        <div className="mb-6">
+          <label className="flex items-start">
+            <input type="checkbox" className="mt-1 mr-3 rounded accent-primary" required />
+            <span className="text-sm text-gray-600">
+              I agree to the{' '}
+              <a href="#" className="text-primary hover:text-accent font-medium transition-colors">
+                Terms of Service
+              </a>{' '}
+              and{' '}
+              <a href="#" className="text-primary hover:text-accent font-medium transition-colors">
+                Privacy Policy
+              </a>
+            </span>
+          </label>
         </div>
-      </div>
-    </div>
+
+        <Button type="submit" variant="primary" size="lg" isLoading={isLoading} className="w-full">
+          Create Account
+        </Button>
+      </form>
+
+      <p className="text-center text-gray-600 mt-6 text-sm">
+        Already have an account?{' '}
+        <Link href="/login" className="text-primary hover:text-accent font-semibold transition-colors">
+          Sign in here
+        </Link>
+      </p>
+    </AuthShell>
   );
 }

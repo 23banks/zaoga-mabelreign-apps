@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { Trash2, Upload } from 'lucide-react';
 import { mediaAPI } from '@/lib/api';
-import { mediaEmoji } from '@/lib/format';
+import Thumb from '@/components/common/Thumb';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 
@@ -97,9 +97,7 @@ export default function AdminMediaPage() {
                   <img src={m.url} alt={m.title} className="w-full h-40 object-cover rounded-lg mb-3" />
                 )
               ) : (
-                <div className="w-full h-40 flex items-center justify-center text-5xl bg-gray-100 rounded-lg mb-3">
-                  {mediaEmoji(m.type)}
-                </div>
+                <Thumb type={m.type} className="h-40 mb-3" />
               )}
               <div className="flex items-start justify-between gap-2">
                 <div>

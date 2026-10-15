@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Heart } from 'lucide-react';
-import SectionHeading from '@/components/common/SectionHeading';
+import PageHeader from '@/components/common/PageHeader';
 import Input from '@/components/common/Input';
 import Textarea from '@/components/common/Textarea';
 import Button from '@/components/common/Button';
@@ -62,16 +62,17 @@ export default function TestimoniesPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-16">
-      <SectionHeading
+    <>
+      <PageHeader
         eyebrow="Testimonies"
         title="Stories of God's Faithfulness"
         description="Members share testimonies for encouragement and spiritual growth."
       />
 
+      <div className="container py-12">
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
-          <form onSubmit={handleSubmit} className="card">
+          <form onSubmit={handleSubmit} className="card lg:sticky lg:top-24">
             <h3 className="text-lg font-bold mb-4">Share Your Testimony</h3>
             <Input
               label="Your Name (optional)"
@@ -106,12 +107,12 @@ export default function TestimoniesPage() {
           {isLoading && <p className="text-gray-500">Loading testimonies...</p>}
           {!isLoading &&
             testimonies.map((t) => (
-              <div key={t.id} className="card">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-bold text-gray-900">{t.title}</h3>
-                  <p className="text-xs text-gray-400">{formatDate(t.date)}</p>
+              <div key={t.id} className="card border-l-4 border-l-accent">
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <h3 className="font-bold text-xl text-ink">{t.title}</h3>
+                  <p className="text-xs text-gray-400 shrink-0">{formatDate(t.date)}</p>
                 </div>
-                <p className="text-gray-700 mb-4">{t.story}</p>
+                <p className="text-gray-700 mb-4 leading-relaxed font-display italic">&ldquo;{t.story}&rdquo;</p>
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-gray-500">— {t.name}</p>
                   <button
@@ -132,6 +133,7 @@ export default function TestimoniesPage() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

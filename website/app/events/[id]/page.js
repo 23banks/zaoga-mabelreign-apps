@@ -14,36 +14,49 @@ export default async function EventDetailPage({ params }) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16 max-w-3xl">
-      <Link href="/events" className="inline-flex items-center text-primary hover:text-primary/80 mb-6">
-        <ArrowLeft size={20} className="mr-2" />
+    <div className="container py-12 max-w-3xl">
+      <Link href="/events" className="inline-flex items-center gap-2 font-semibold text-primary hover:text-accent transition-colors mb-6">
+        <ArrowLeft size={18} />
         Back to Events
       </Link>
 
-      <div className="card">
-        <span className="badge bg-primary/10 text-primary mb-3">{event.category}</span>
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">{event.title}</h1>
-
-        <div className="space-y-2 text-gray-600 mb-6">
-          <p className="flex items-center gap-2">
-            <CalendarDays size={18} className="text-primary" /> {formatDate(event.date)}
-          </p>
-          <p className="flex items-center gap-2">
-            <Clock size={18} className="text-primary" /> {event.time}
-          </p>
-          <p className="flex items-center gap-2">
-            <MapPin size={18} className="text-primary" /> {event.location}
-          </p>
+      <article className="card p-0 overflow-hidden">
+        <div className="relative bg-gradient-to-br from-ink via-primary to-secondary text-white p-8 md:p-10">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 opacity-40"
+            style={{ backgroundImage: 'radial-gradient(circle at 85% 20%, rgba(201,151,43,0.45), transparent 45%)' }}
+          />
+          <div className="relative">
+            <span className="badge bg-accent text-ink mb-4">{event.category}</span>
+            <h1 className="text-3xl md:text-4xl font-bold">{event.title}</h1>
+          </div>
         </div>
 
-        <p className="text-gray-700 leading-relaxed mb-6">{event.description}</p>
+        <div className="p-8 md:p-10">
+          <div className="grid sm:grid-cols-3 gap-4 mb-8">
+            {[
+              { Icon: CalendarDays, label: 'Date', value: formatDate(event.date) },
+              { Icon: Clock, label: 'Time', value: event.time },
+              { Icon: MapPin, label: 'Location', value: event.location },
+            ].map(({ Icon, label, value }) => (
+              <div key={label} className="rounded-xl bg-gray-50 border border-gray-200 p-4">
+                <Icon size={20} className="text-accent mb-2" />
+                <p className="text-xs uppercase tracking-wider text-gray-500">{label}</p>
+                <p className="font-semibold text-ink">{value}</p>
+              </div>
+            ))}
+          </div>
 
-        <EventRegisterButton
-          eventId={event.id}
-          eventTitle={event.title}
-          initialAttendeeCount={event.attendeeCount}
-        />
-      </div>
+          <p className="text-gray-700 leading-relaxed text-lg mb-8">{event.description}</p>
+
+          <EventRegisterButton
+            eventId={event.id}
+            eventTitle={event.title}
+            initialAttendeeCount={event.attendeeCount}
+          />
+        </div>
+      </article>
     </div>
   );
 }

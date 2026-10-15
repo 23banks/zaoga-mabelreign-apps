@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import SectionHeading from '@/components/common/SectionHeading';
+import PageHeader from '@/components/common/PageHeader';
+import Thumb from '@/components/common/Thumb';
 import { mediaAPI } from '@/lib/api';
-import { mediaEmoji } from '@/lib/format';
 
 const types = ['All', 'photo', 'video'];
 
@@ -26,55 +26,63 @@ export default function GalleryPage() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-16">
-      <SectionHeading
+    <>
+      <PageHeader
         eyebrow="Media Gallery"
         title="Photo & Video Highlights"
         description="Relive the highlights from our church events and activities."
       />
 
-      <div className="flex flex-wrap gap-2 justify-center mb-10">
-        {types.map((t) => (
-          <button
-            key={t}
-            onClick={() => setType(t)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-colors ${
-              type === t ? 'bg-primary text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-            }`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <div className="container py-12">
+        <div className="flex flex-wrap gap-2 justify-center mb-10">
+          {types.map((t) => (
+            <button
+              key={t}
+              onClick={() => setType(t)}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold capitalize transition-all ${
+                type === t
+                  ? 'bg-primary text-white shadow-md shadow-primary/25'
+                  : 'bg-white text-gray-600 hover:text-primary border border-gray-200 hover:border-primary'
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
 
-      {isLoading ? (
-        <p className="text-center text-gray-500">Loading gallery...</p>
-      ) : (
-        <>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((m) => (
-              <div key={m.id} className="card text-center overflow-hidden">
-                {m.url ? (
-                  m.type === 'video' ? (
-                    <video src={m.url} controls className="w-full h-48 object-cover rounded-lg mb-4 bg-black" />
+        {isLoading ? (
+          <p className="text-center text-gray-500">Loading gallery...</p>
+        ) : (
+          <>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filtered.map((m) => (
+                <div key={m.id} className="card p-3 overflow-hidden">
+                  {m.url ? (
+                    m.type === 'video' ? (
+                      <video src={m.url} controls className="w-full h-52 object-cover rounded-xl mb-3 bg-black" />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={m.url} alt={m.title} className="w-full h-52 object-cover rounded-xl mb-3" />
+                    )
                   ) : (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={m.url} alt={m.title} className="w-full h-48 object-cover rounded-lg mb-4" />
-                  )
-                ) : (
-                  <div className="text-6xl mb-4">{mediaEmoji(m.type)}</div>
-                )}
-                <h3 className="font-semibold text-gray-900">{m.title}</h3>
-                <p className="text-sm text-gray-500 mt-1">{m.event}</p>
-                <span className="badge bg-primary/10 text-primary mt-3 capitalize">{m.type}</span>
-              </div>
-            ))}
-          </div>
-          {filtered.length === 0 && (
-            <p className="text-center text-gray-500 mt-12">No media in this category yet.</p>
-          )}
-        </>
-      )}
-    </div>
+                    <Thumb type={m.type} className="h-52 mb-3" iconSize={44} />
+                  )}
+                  <div className="px-2 pb-2 flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-bold text-ink leading-snug">{m.title}</h3>
+                      <p className="text-sm text-gray-500 mt-0.5">{m.event}</p>
+                    </div>
+                    <span className="badge bg-primary/10 text-primary capitalize shrink-0">{m.type}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {filtered.length === 0 && (
+              <p className="text-center text-gray-500 mt-12">No media in this category yet.</p>
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
 }
